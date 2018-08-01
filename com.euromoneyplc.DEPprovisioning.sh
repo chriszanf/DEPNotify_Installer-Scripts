@@ -237,7 +237,7 @@ if pgrep -x "Finder" &&
   # Install connect drive app
   depTitle "Connect Network Drives..."
   depText "This is the tool to connnect network drives on login according to the users security group membership on Active Directory."
-  jamfPol "install-connectScript"
+  jamfPol "install-connect"
   policyFin "ConnectNetwork"
 
   # Install corporate wifi profile
