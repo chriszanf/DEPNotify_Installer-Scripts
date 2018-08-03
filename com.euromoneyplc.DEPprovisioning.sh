@@ -99,7 +99,7 @@ unloadLD() {
 #
 # JAMF FUNCTIONS
 jamfPol() {
-  $JAMFBIN policy -event "${1}" -verbose
+  $JAMFBIN policy -event "$1" -verbose
 }
 
 # Policy Receipt Check
