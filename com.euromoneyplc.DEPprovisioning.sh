@@ -3,15 +3,15 @@
 # Set -x
 ##############################################################
 #
-#	Name: com.euromoneyplc.DEPprovisioning.sh
-#	Description: Overall config to run DEPNotify stream
-# Notes: Based on YearOfTheGeek script: https://goo.gl/9up2ke
-#	Author: Chris Jarvis
-#	Date: 17/07/2018
-#	Version History:
-#   1.0: 17/07/2018 - Initial script
-#   1.1: 30/07/2018 - Added a policyFin func & tidied up a few bits
-#   1.2: 03/08/2018 - Refactoring functions & clean up
+#   Name: com.euromoneyplc.DEPprovisioning.sh
+#   Description: Overall config to run DEPNotify stream
+#   Notes: Based on YearOfTheGeek script: https://goo.gl/9up2ke
+#   Author: Chris Jarvis
+#   Date: 17/07/2018
+#   Version History:
+#     1.0: 17/07/2018 - Initial script
+#     1.1: 30/07/2018 - Added a policyFin func & tidied up a few bits
+#     1.2: 03/08/2018 - Refactoring functions & clean up
 #
 #
 ##############################################################
