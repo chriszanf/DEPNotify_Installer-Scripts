@@ -27,6 +27,11 @@ deviceType="$(system_profiler SPHardwareDataType | grep "Model Identifier" | awk
 # Find the JAMF binary
 JAMFBIN="$(which jamf | awk '{print $3}')"
 
+if [[ $JAMFBIN != '/usr/local/bin/jamf' ]]; then
+  #statements
+  JAMFBIN=''/usr/local/bin/jamf''
+fi
+
 # Completion receipt folder
 setupDone="/var/db/receipts/com.euromoneyplc.provisioning.done.bom"
 
