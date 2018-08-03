@@ -12,17 +12,17 @@ The main script is broken down into a few sections:
 3. DEPNotify Registration & Inital main page settings
 4. Operations:
 
-  Check Finder/Dock are running & the user is not \_mbsetupuser
-  Kill any installers
-  Caffeinate the machine
-  Run DEPNotify.app
-  Issue the ContinueButtonRegister command
-  Run a `while` loop until the .plist is written
-  Rename the machine based on the input
-  Start running policies
+  Check Finder/Dock are running & the user is not \_mbsetupuser    
+  Kill any installers    
+  Caffeinate the machine    
+  Run DEPNotify.app    
+  Issue the ContinueButtonRegister command    
+  Run a `while` loop until the .plist is written    
+  Rename the machine based on the input    
+  Start running policies    
 
   The policies are structured as follows:
-  
+
       * depTitle   Changes the title on the splash
       * depText    Changes the text
       * jamfPol    Runs the JAMF policy
