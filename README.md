@@ -23,10 +23,10 @@ The main script is broken down into a few sections:
 
   The policies are structured as follows:
 
-      * depTitle   Changes the title on the splash
-      * depText    Changes the text
-      * jamfPol    Runs the JAMF policy
-      * policyFin  Checks policy receipt exists in JAMF folder
-      * depStep    Adds step to progress bar & reactivates window to bring it to the front
+  * depTitle   Changes the title on the splash
+  * depText    Changes the text
+  * jamfPol    Runs the JAMF policy
+  * policyFin  Checks policy receipt exists in JAMF folder
+  * depStep    Adds step to progress bar & reactivates window to bring it to the front
 
 5. Clean-Up: de-caffeinate the machine, send the quit messages then archive some logs and delete the rest
