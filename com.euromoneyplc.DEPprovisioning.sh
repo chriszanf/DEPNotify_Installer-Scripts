@@ -34,7 +34,7 @@ setupDone="/var/db/receipts/com.euromoneyplc.provisioning.done.bom"
 receiptPath="/Users/Shared/DEPN/Receipts"
 
 if [[ ! -d $receiptPath ]]; then
-  # mkdir -p
+  # if it aint there; make it!
   mkdir -p $receiptPath
 fi
 
