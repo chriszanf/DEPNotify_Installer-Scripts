@@ -12,6 +12,7 @@
 #     1.0: 17/07/2018 - Initial script
 #     1.1: 30/07/2018 - Added a policyFin func & tidied up a few bits
 #     1.2: 03/08/2018 - Refactoring functions & clean up
+#     1.3: 08/08/2018 - Refactor & merged all policies down to 3 instead of about 6
 #
 #
 ##############################################################
@@ -49,29 +50,29 @@ DNPLIST="/Users/Shared/DEPN/DEPNotify.plist"
 # Set the log file
 DNLOG="/var/tmp/DEPNotify.log"
 touch "$DNLOG"
-exec 3>&1 1>>${DNLOG} 2>&1
+#exec 3>&1 1>>${DNLOG} 2>&1
 
 ########################################
 # DEPNotify Command functions
 depCmd() {
-  echo "Command: $*" | tee /dev/fd/3
+  echo "Command: $*" >> /var/tmp/DEPNotify.log
 }
 
 depTitle() {
-  echo "Command: MainTitle: $*" | tee /dev/fd/3
+  echo "Command: MainTitle: $*" >> /var/tmp/DEPNotify.log
 }
 
 depText() {
-  echo "Command: MainText: $*" | tee /dev/fd/3
+  echo "Command: MainText: $*" >> /var/tmp/DEPNotify.log
 }
 
 depStat() {
-  echo "Status: $*" | tee /dev/fd/3
+  echo "Status: $*" >> /var/tmp/DEPNotify.log
 }
 
 depStep() {
   depCmd "WindowStyle: ActivateOnStep"
-  depCmd "DeterminateSManualStep:"
+  depCmd "DeterminateStep: ${1}"
 }
 
 depReg() {
@@ -104,7 +105,7 @@ unloadLD() {
 #
 # JAMF FUNCTIONS
 jamfPol() {
-  $JAMFBIN policy -event "$1" -verbose
+  $JAMFBIN policy -verbose -event "$1"
 }
 
 # Policy Receipt Check
@@ -134,13 +135,13 @@ depReg RegisterButtonLabel "Assign"
 depReg UITextFieldUpperPlaceholder "Asset Number"
 depReg UITextFieldUpperLabel "ComputerName"
 depReg UIPopUpMenuLowerLabel "Site"
-/usr/bin/sudo -u "$CURRENTUSER" defaults write menu.nomad.DEPNotify UIPopUpMenuLower -array "EU" "US" "AP"
+/usr/bin/sudo -u "$CURRENTUSER" defaults write menu.nomad.DEPNotify UIPopUpMenuLower -array "EU" "US" "AP" "CA"
 #
 # Main Intro UI
 depTitle "Begin Deployment"
-depText "This process will require you to add the hostname and select the region on the next page. It will then bind to Active Directory and add the base packages and additonal ones according to geolocation selected. The process will take about 30 minutes and reboot automatically at the end."
+depText "This process will require you to add the hostname and select the region on the next page. \n \nIt will then bind to Active Directory, add the base packages and utilities. \n \nThe process will take about 30 minutes and reboot automatically at the end."
 depCmd "Image: /Users/Shared/DEPN/em-logo.png"
-depCmd "DeterminateManual: 10"
+depCmd "DeterminateManual: 5"
 depCmd "WindowStyle: NotMovable"
 #
 
@@ -195,8 +196,8 @@ if pgrep -x "Finder" && pgrep -x "Dock" && [ "$CURRENTUSER" != "_mbsetupuser" ] 
 
   # Change screen ready for deployment
   depCmd "MainTitle: Preparing for deployment"
-  depCmd "MainText: Please do not shutdown, reboot or close the device. The process might take about 20 - 30 minutes.\n The machine will reboot automatically at the end"
-  depStep
+  depCmd "MainText: Please do not shutdown, reboot or close the device. The process can take about 20 - 30 minutes.\n The machine will reboot automatically at the end"
+  depStep "1"
 
   ########################################
   # Run Policies
@@ -210,55 +211,31 @@ if pgrep -x "Finder" && pgrep -x "Dock" && [ "$CURRENTUSER" != "_mbsetupuser" ] 
   # 5. depStep    <- Adds step to progress bar & reactivates window
 
   # Run Binding scripts and certificate installation
-  depTitle "Running enrollment scripts..."
-  depText "This will deploy some basic settings and also bind the machine to Active Directory"
+  depTitle "Running Deployment Policies..."
+  depText "This will deploy various settings as well as install software and utilities..."
   jamfPol "install-DEPEnroll"
-  policyFin "DEP-Enrollment.txt"
-  depStep
-  ########################################
+  depStep "2"
 
-  # Install utilities & certificates
-  depTitle "Install basic utilities..."
-  depText "We are now going to install some utilities and tools"
-  jamfPol "install-DEPutil"
-  policyFin "DEP-Utilities.txt"
-  depStep
-  ########################################
-
-  # Run Binding scripts and certificate installation
-  depTitle "Install basic utilities..."
-  depText "We are now going to install some basic applications"
-  jamfPol "install-DEPApps"
-  policyFin "DEP-Applications.txt"
-  depStep
-  ########################################
-
-  # Install Office
-  depTitle "Microsoft Office 2016"
-  depText "Installing MS Office 2016 16.15"
-  jamfPol "install-officebase"
-  policyFin "DEP-Office.txt"
-  depStep
 
   ########################################
+
   # Install Cisco AnyConnect if its a laptop
   if [ $deviceType != "" ]; then
 
-    depTitle "Install Cisco AnyConnect VPN"
+    depTitle "Cisco AnyConnect VPN"
     depStat "Installing Cisco AnyConnect VPN with settings package based on the region chosen..."
 
     # Site chosen by dropdown
     case $hostSite in
 
     EU*)
-      package="install-anyconnect-uk"
-      ;;
+      package="install-anyconnect-uk";;
     US*)
-      package="install-anyconnect-us"
-      ;;
+      package="install-anyconnect-us";;
     AP*)
-      package="install-anyconnect-ap"
-      ;;
+      package="install-anyconnect-ap";;
+    CA*)
+      package="install-anyconnect-us";;
     esac
     # Install anyconnect settings package based on site
     jamfPol "$package"
@@ -266,7 +243,7 @@ if pgrep -x "Finder" && pgrep -x "Dock" && [ "$CURRENTUSER" != "_mbsetupuser" ] 
     # Install anyconnect app package
     jamfPol "install-anyconnect"
     policyFin "DEP-AnyConnect.txt"
-    depStep
+    depStep "3"
 
   fi
   ########################################
@@ -274,16 +251,17 @@ if pgrep -x "Finder" && pgrep -x "Dock" && [ "$CURRENTUSER" != "_mbsetupuser" ] 
   # Install Post Scripts
   depCmd "Image: /Users/Shared/DEPN/em-logo.png"
   depTitle "Post Install"
-  depText "Now running some post install stuff"
+  depText "Now running some post install scripts and settings"
   jamfPol "install-DEPPost"
   policyFin "DEP-Post.txt"
-  depStep
+  depStep "4"
   ########################################
 
-  # Process complete
+    # Process complete
   depTitle "DEP Build Complete"
-  depText "The process is now complete and clean up will begin.\nOnce completed, the machine will automatically reboot."
-  depStep
+  depText "The process is now complete and clean up will begin. Once completed, the machine should automatically reboot."
+  depStep "5"
+  sleep 5
   ########################################
   #
   # CLEAN UP FILES AND LOGS
@@ -300,7 +278,7 @@ if pgrep -x "Finder" && pgrep -x "Dock" && [ "$CURRENTUSER" != "_mbsetupuser" ] 
   depCmd "Quit: Quitting"
 
   # Create a bom file that allow this script to stop launching DEPNotify after done
-  /usr/bin/touch $setupDone
+  /bin/echo "$(date)" >> $setupDone
 
   # Remove DEPN folder and the logs
   ########################################
