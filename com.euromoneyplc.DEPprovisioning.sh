@@ -30,7 +30,7 @@ JAMFBIN="$(which jamf | awk '{print $3}')"
 
 if [[ $JAMFBIN != '/usr/local/bin/jamf' ]]; then
   #statements
-  JAMFBIN=''/usr/local/bin/jamf''
+  JAMFBIN="/usr/local/bin/jamf"
 fi
 
 # Completion receipt folder
